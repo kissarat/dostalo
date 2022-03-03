@@ -1,4 +1,4 @@
-const { dirname, join } = require('path')
+const { join } = require('path')
 const { tmpdir } = require('os')
 const { readJSON, getOptions } = require('./utils')
 const { omit, pick } = require('rambda')
