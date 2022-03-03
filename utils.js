@@ -5,6 +5,10 @@ function readJSON(filename) {
     return JSON.parse(readFileSync(filename))
 }
 
+function serialize(obj) {
+    return JSON.stringify(obj, null, '  ')
+}
+
 function getProcessArguments(args = process.argv) {
     // const nodeIndex = isElectronNode ? 0 : args.map(a => basename(a)).indexOf('node');
     const nodeIndex = args.map(a => basename(a)).indexOf('node');
@@ -27,4 +31,4 @@ function getOptions(args = process.argv, options = {}) {
     return [options, ...ordered];
 }
 
-module.exports = { readJSON, getProcessArguments, getOptions }
+module.exports = { readJSON, getProcessArguments, getOptions, serialize }

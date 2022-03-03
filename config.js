@@ -6,7 +6,7 @@ const { omit, pick } = require('rambda')
 const config = readJSON(join(__dirname, 'default-config.json'));
 const currentdir = process.cwd()
 
-const [options] = getOptions(process.argv)
+const [options, command] = getOptions(process.argv)
 
 try {
     const headers = config.headers
@@ -21,6 +21,7 @@ try {
 
 config.basedir = __dirname
 config.currentdir = currentdir
+config.command = command
 Object.assign(config, pick(['targets', 'proxies', 'tmpdir'], options))
 
 if ('string' !== typeof config.tmpdir) {
