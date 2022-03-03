@@ -2,6 +2,6 @@ __MACOSX/
 .DS_Store
 /.idea/
 /.vscode/
-/config/local.json
+/local-config.json
 /node_modules/
 Thumbs.db
