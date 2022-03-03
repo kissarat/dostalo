@@ -23,5 +23,9 @@
   "homepage": "https://github.com/kissarat/dostalo#readme",
   "dependencies": {
     "rambda": "^7.0.3"
+  },
+  "engines" : { 
+    "npm" : ">=6.0.0",
+    "node" : ">=14.0.0"
   }
 }
