@@ -1,12 +1,13 @@
 const { join } = require('path')
 const { tmpdir } = require('os')
 const { readJSON, getOptions } = require('./utils')
-const { omit, pick } = require('rambda')
+const { omit, pick } = require('rambda');
+const { applyPatch } = require('fast-json-patch');
 
 const config = readJSON(join(__dirname, 'default-config.json'));
 const currentdir = process.cwd()
 
-const [options, command] = getOptions(process.argv)
+const [options, ...items] = getOptions(process.argv)
 
 try {
     const headers = config.headers
@@ -21,11 +22,21 @@ try {
 
 config.basedir = __dirname
 config.currentdir = currentdir
-config.command = command
+config.items = items
 Object.assign(config, pick(['targets', 'proxies', 'tmpdir'], options))
+
+const pkg = readJSON(join(__dirname, 'package.json'))
+Object.assign(config, pick(['version', 'engines'], pkg))
 
 if ('string' !== typeof config.tmpdir) {
     config.tmpdir = tmpdir()
 }
 
 module.exports = config
+
+function patch(changes) {
+    module.exports = applyPatch(module.exports, changes).newDocument
+    module.exports.patch = patch
+}
+
+module.exports.patch = patch
