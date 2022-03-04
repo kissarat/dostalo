@@ -1,32 +1,32 @@
-const { sequetial, runTask, getAction, runJob } = require("./actions")
-const { isPromise, isGeneratorFunction } = require("./predicates")
+const { schedule, attackPromises } = require("./attack")
+const { download, downloadAll } = require("./download")
+const { serialize } = require("./utils")
 
-async function main(items, config, context = {}) {
+async function main([command, ...args], config) {
     try {
-        let i = 0
-        for (const item of items) {
-            const action = getAction({ ...config, action: item })
-            let result = action.handle(config, context)
-            if (result) {
-                if (isPromise(result)) {
-                    result = await result
+        switch (command) {
+            case 'config':
+                console.log(serialize(config))
+                break
+            case 'attack':
+                await downloadAll()
+                schedule()
+                const p = [].concat(...Object.values(attackPromises));
+                setTimeout(() => console.log(p), 15000)
+                break
+            case 'download': {
+                const name = args[0] || ''
+                if (name) {
+                    await download(name)
+                } else {
+                    await downloadAll()
                 }
-                if (result.input) {
-                    const sub = items.slice(i+1)
-                    for(const sourceItem of result.input) {
-                        const target = main(sub, sourceItem)
-                        if (result.output) {
-                            if (sourceItem.id) {
-                                target.id = sourceItem.id
-                            }
-                            result.output.next(target)
-                        }
-                    }
-                }
+                break
             }
-            i++
+            default:
+                throw new Error(`Unknown command ${command}`)
+
         }
-        return context
     } catch (err) {
         console.error(err)
     }

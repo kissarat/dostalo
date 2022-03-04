@@ -23,7 +23,7 @@ try {
 config.basedir = __dirname
 config.currentdir = currentdir
 config.items = items
-Object.assign(config, pick(['targets', 'proxies', 'tmpdir'], options))
+Object.assign(config, pick(['targets', 'proxies', 'tmpdir', 'logfile'], options))
 
 const pkg = readJSON(join(__dirname, 'package.json'))
 Object.assign(config, pick(['version', 'engines'], pkg))

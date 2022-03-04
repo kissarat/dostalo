@@ -1,12 +1,21 @@
-const { readFileSync } = require("fs");
+const { readFileSync, writeFileSync } = require("fs");
 const { basename } = require("path");
+const { stringify } = require("querystring");
 
 function readJSON(filename) {
-    return JSON.parse(readFileSync(filename))
+    try {
+        return JSON.parse(readFileSync(filename))
+    } catch (err) {
+        return null
+    }
 }
 
 function serialize(obj) {
     return JSON.stringify(obj, null, '  ')
+}
+
+function writeJSON(filename, data) {
+    return writeFileSync(filename, serialize(data))
 }
 
 const parsers = {
@@ -52,4 +61,4 @@ function collect(input) {
     })
 }
 
-module.exports = { readJSON, getProcessArguments, getOptions, serialize, collect, parsers }
+module.exports = { readJSON, getProcessArguments, getOptions, serialize, collect, writeJSON, parsers }

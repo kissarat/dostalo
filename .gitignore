@@ -4,4 +4,5 @@ __MACOSX/
 /.vscode/
 /local-config.json
 /node_modules/
+attacks.log
 Thumbs.db

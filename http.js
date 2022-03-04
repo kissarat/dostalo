@@ -3,16 +3,19 @@ const httpModule = require('http')
 const httpsModule = require('https')
 const { URL } = require('url');
 const { parsers, readJSON } = require('./utils');
+const { isObjectLike } = require('./predicates');
+const { pick } = require('rambda');
+// const qs = require('querystring');
 
-function headleError(source, reject) {
+function handleError(source, reject) {
     source.on('error', function (err) {
         reject(err)
     })
 }
 
-const requestOptions = ["agent", "auth", "createConnection", "method", "maxHeaderSize"]
+const requestOptions = ["agent", "auth", "createConnection", "method", "maxHeaderSize", "timeout"]
 
-function validateRequestTask(options) {
+function validateRequest(options) {
     const opts = 'string' === typeof options
         ? { url: options }
         : options
@@ -23,17 +26,26 @@ function validateRequestTask(options) {
 function request(options) {
     return new Promise(function (resolve, reject) {
         const url = new URL(options.url)
-        const http = 'https:' === url.protocol
+        const protocol = url.protocol || config.onlyProtocol
+        const http = 'https:' === protocol
             ? httpsModule
             : httpModule
         const httpOptions = pick(requestOptions, options)
+        httpOptions.timeout = config.timeout
         httpOptions.headers = httpOptions.headers && config.requestHeaders
             ? Object.assign(httpOptions.headers, config.requestHeaders)
             : (config.requestHeaders || {})
-        const req = http.request(url.toString(), httpOptions, function (res) {
+        // if (isObjectLike(options.query)) {
+        //     url.search = '?' + qs.stringify(options.query)
+        // }
+        const urlString = url.toString()
+        // console.log(urlString, httpOptions)
+        const req = http.request(urlString, httpOptions, function (res) {
+            console.log(res.statusCode, urlString, httpOptions)
+            handleError(res, reject)
             const chunks = []
-            const collectResponse = 'string' === typeof options.headers.accept
-            if (collectResponse) {
+            const parse = parsers[options.parser]
+            if (parse) {
                 res.on('data', function (chunk) {
                     chunks.push(chunk)
                 })
@@ -42,17 +54,18 @@ function request(options) {
                 res.raw = null
                 res.data = null
                 res.contentType = res.headers['content-type'] || ''
-                if (collectResponse) {
+                if (parse) {
                     res.raw = Buffer.concat(chunks)
-                    const parse = parsers[options.parser]
-                    if ('function' === parse) {
-                        res.data = parse(res.raw.toString(config.encoding))
-                    }
+                    res.data = parse(res.raw.toString(config.encoding))
                 }
                 resolve(res)
             })
         })
-        headleError(req, reject)
+        handleError(req, reject)
+        // req.on('socket', function(socket) {
+        //     socket.setTimeout(config.timeout)
+        // })
+        req.end()
     })
 }
 
@@ -66,5 +79,5 @@ function requestJSON(options) {
 module.exports = {
     request,
     requestJSON,
-    validateRequestTask
+    validateRequest
 }

@@ -1,17 +1,7 @@
 const { createReadStream } = require('fs')
 const { createServer } = require('http')
-const { v4: uuid } = require('uuid')
-const { serialize } = require('v8')
-const { tasks } = require('./storage')
 const config = require('./config')
-const { collect, parsers } = require('./utils')
-
-function listen(url) {
-    const stream = url
-        ? createReadStream(url)
-        : process.stdout
-    return stream
-}
+const { collect, parsers, serialize } = require('./utils')
 
 function sendJSON(status, res, data) {
     res.statusCode = status
@@ -32,7 +22,6 @@ function collectJSON(req) {
 async function serve(options, next) {
     const server = createServer(async function (req, res) {
         try {
-            const id = req.url.slice(1) || uuid()
             let result
             switch (req.method) {
                 case 'GET':
@@ -45,11 +34,7 @@ async function serve(options, next) {
                     break
                 }
             }
-            if (result) {
-                result.id = id
-            }
             sendJSON(200, res, { ok: 1 })
-            const result = await next(data)
             
         } catch (err) {
             console.error(err)

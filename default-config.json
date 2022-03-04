@@ -1,9 +1,12 @@
 {
-    "targets": "https://raw.githubusercontent.com/opengs/uashieldtargets/master/sites.json",
-    "proxies": "https://raw.githubusercontent.com/opengs/uashieldtargets/master/proxy.json",
+    "targetsURL": "https://raw.githubusercontent.com/opengs/uashieldtargets/master/sites.json",
+    "proxiesURL": "https://raw.githubusercontent.com/opengs/uashieldtargets/master/proxy.json",
+    "downloadMaxAge": 600,
     "requestHeaders": {
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
-        "accept": "text/html"
-    },
-    "encoding": "utf-8"
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
+    }, 
+    "encoding": "utf-8",
+    "onlyProtocol": "https:",
+    "writeLogInterval": 1000,
+    "timeout": 5000
 }
