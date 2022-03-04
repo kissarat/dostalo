@@ -32,15 +32,25 @@ function request(options) {
             : httpModule
         const httpOptions = pick(requestOptions, options)
         httpOptions.timeout = config.timeout
-        httpOptions.headers = httpOptions.headers && config.requestHeaders
-            ? Object.assign(httpOptions.headers, config.requestHeaders)
-            : (config.requestHeaders || {})
+        if (options.proxy) {
+            httpOptions.method = 'CONNECT'
+            const parts = options.proxy.ip.split(':')
+            httpOptions.host = parts[0]
+            httpOptions.port = +parts[1]
+            httpOptions.headers['proxy-authorization'] = 'basic ' + Buffer(options.proxy.auth).toString('base64')
+        } else {
+            httpOptions.host = url.host
+            httpOptions.port = 443
+            httpOptions.headers = httpOptions.headers && config.requestHeaders
+                ? Object.assign(httpOptions.headers, config.requestHeaders)
+                : (config.requestHeaders || {})
+        }
         // if (isObjectLike(options.query)) {
         //     url.search = '?' + qs.stringify(options.query)
         // }
         const urlString = url.toString()
         // console.log(urlString, httpOptions)
-        const req = http.request(urlString, httpOptions, function (res) {
+        const req = http.request(httpOptions, function (res) {
             console.log(res.statusCode, urlString, httpOptions)
             handleError(res, reject)
             const chunks = []

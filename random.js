@@ -21,4 +21,4 @@ function randomString(alphabet, max = 1) {
     return Array.from(randomGenerator(alphabet, max)).join('')
 }
 
-module.exports = { randomString, randomInt }
+module.exports = { randomString, randomInt, randomItem }
